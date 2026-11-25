@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null && request.auth.token.email != null; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function profilePath() { return /databases/$(database)/documents/usuarios/$(myEmail()); }
+    function hasProfile() { return signedIn() && exists(profilePath()); }
+    function profile() { return get(profilePath()).data; }
+    function notBlocked() { return profile().get('bloqueado', false) != true; }
+
+    // Administrador principal: documento admins/{correo}, solo se cambia desde la consola.
+    function isSuperAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(myEmail()));
+    }
+    // Administrador: el principal, o quien tenga rol "admin" en usuarios/{correo} y no esté bloqueado.
+    function isAdmin() {
+      return isSuperAdmin() || (hasProfile() && profile().get('rol', '') == 'admin' && notBlocked());
+    }
+    // Puede trabajar con una empresa: administrador, o usuario no bloqueado que la tenga asignada.
+    function canUse(emp) {
+      return isAdmin() || (hasProfile() && notBlocked() && emp in profile().get('empresas', []));
+    }
+
+    match /admins/{email} {
+      allow read: if signedIn() && myEmail() == email;
+      allow write: if false;
+    }
+
+    // Perfil y permisos de cada persona (el id es el correo en minúsculas).
+    match /usuarios/{email} {
+      allow read: if isAdmin() || (signedIn() && myEmail() == email);
+
+      // La primera vez que alguien entra se crea su perfil sin empresas; solo un admin puede darle acceso.
+      allow create: if isAdmin()
+                    || (signedIn() && myEmail() == email
+                        && request.resource.data.keys().hasOnly(['email', 'nombre', 'uid', 'lastLogin', 'rol', 'empresas', 'bloqueado', 'createdAt'])
+                        && request.resource.data.rol == 'usuario'
+                        && request.resource.data.empresas.size() == 0
+                        && request.resource.data.bloqueado == false);
+
+      // Cada uno solo puede actualizar sus datos de ingreso, nunca su rol ni sus empresas.
+      allow update: if isAdmin()
+                    || (signedIn() && myEmail() == email
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['email', 'nombre', 'uid', 'lastLogin']));
+
+      allow delete: if isAdmin();
+    }
+
+    // Solicitudes de artículos
+    match /articulos/{id} {
+      allow read: if isAdmin()
+                  || (signedIn() && resource.data.createdBy == request.auth.uid);
+
+      allow create: if isAdmin()
+                    || (signedIn()
+                        && request.resource.data.createdBy == request.auth.uid
+                        && request.resource.data.exportado == false
+                        && canUse(request.resource.data.empresa));
+
+      // El usuario solo puede cambiar sus valores mientras no esté exportado.
+      allow update: if isAdmin()
+                    || (signedIn()
+                        && resource.data.createdBy == request.auth.uid
+                        && resource.data.exportado == false
+                        && canUse(resource.data.empresa)
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['valores', 'updatedAt', 'updatedBy']));
+
+      allow delete: if isAdmin()
+                    || (signedIn()
+                        && resource.data.createdBy == request.auth.uid
+                        && resource.data.exportado == false
+                        && canUse(resource.data.empresa));
+    }
+
+    // Correlativo de solicitudes por empresa: solo se puede avanzar de a uno.
+    match /contadores/{emp} {
+      allow read: if canUse(emp);
+      allow create: if canUse(emp) && request.resource.data.ultimo == 1;
+      allow update: if canUse(emp) && request.resource.data.ultimo == resource.data.ultimo + 1;
+      allow delete: if false;
+    }
+
+    // Catálogos: todos leen, solo el admin escribe.
+    match /config/{doc} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Historial de descargas: solo admin.
+    match /exportaciones/{id} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
