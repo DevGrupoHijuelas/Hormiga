@@ -46,7 +46,9 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [page]);
 
-  if (session.status === "signedOut")
+  // En desarrollo, http://localhost:8766/?login muestra el login sin cerrar la sesión.
+  const verLogin = import.meta.env.DEV && new URLSearchParams(location.search).has("login");
+  if (session.status === "signedOut" || verLogin)
     return (
       <>
         <Login />

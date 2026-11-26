@@ -87,7 +87,7 @@ firestore.rules            reglas de seguridad (publicadas en la consola o con f
 - **Inicio:** resumen por empresa y las últimas solicitudes con su recorrido.
 - **Recorrido de la hormiga:** cada solicitud muestra sus pasos (Enviada, En revisión, Lista, En SAP).
 - **Bandeja en tablero:** el botón *Lista / Tablero* muestra las solicitudes en columnas por estado.
-- El login no cambia con el tema.
+- **Login «Hormiguero»:** fondo verde bosque con un corte de tierra donde una hormiga recorre las cámaras Enviada, En revisión, Lista y En SAP. No cambia con el tema. En desarrollo, `?login` lo muestra sin cerrar la sesión.
 
 ## Publicar en Vercel
 

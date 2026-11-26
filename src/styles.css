@@ -277,19 +277,34 @@ mark { background: var(--marca); color: inherit; padding: 0 1px; }
 .toast.err { background: var(--rojo); }
 @keyframes tin { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* ---------- Login ---------- */
-.login-page { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-.login-brand { background: var(--degradado); color: var(--sobre); padding: 56px clamp(24px, 5vw, 72px); display: flex; flex-direction: column; justify-content: space-between; gap: 40px; }
-.login-brand .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
-.login-brand h1 { font-size: clamp(34px, 4.5vw, 56px); line-height: 1.02; letter-spacing: -.045em; margin: 12px 0 0; font-weight: 700; }
-.login-brand p { opacity: .82; max-width: 44ch; font-size: 15px; }
-.login-brand ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
-.login-brand li { display: flex; gap: 10px; align-items: center; opacity: .9; }
-.login-form-wrap { display: grid; place-items: center; padding: 40px 24px; background: var(--fondo); }
-.loginform { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 16px; }
-.loginform h2 { margin: 0; font-size: 26px; letter-spacing: -.03em; }
+/* ---------- Login: el hormiguero ---------- */
+.login-page { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); background: #0e2a1a; color: #edf3ea; }
+.lh-brand { padding: 44px clamp(24px, 4vw, 64px) 32px; display: flex; flex-direction: column; justify-content: center; gap: 18px; min-width: 0; }
+.lh-brand .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: #9fb8a7; }
+.lh-title { display: flex; align-items: center; gap: 14px; }
+.lh-title svg { color: #a6d98f; flex: none; }
+.lh-title h1 { font-family: var(--serif); font-size: clamp(38px, 4.6vw, 58px); line-height: 1; letter-spacing: -.03em; margin: 0; font-weight: 600; color: #edf3ea; }
+.lh-tagline { font-family: var(--serif); font-style: italic; font-size: 19px; color: #a6d98f; margin: 0; }
+.lh-nest { width: 100%; max-width: 600px; height: auto; display: block; margin-top: 4px; }
+.lh-nest .lbl { font: 600 13px/1 Inter, system-ui, sans-serif; fill: #edf3ea; }
+.lh-nest .sub { font: 400 11px/1 Inter, system-ui, sans-serif; fill: #9fb8a7; }
+.lh-form-wrap { display: grid; place-items: center; padding: 40px 24px; }
+.lh-card { width: 100%; max-width: 400px; background: #fffdf8; color: #16130e; border-radius: 18px; padding: 34px 32px 26px; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.loginform { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.loginform h2 { margin: 0; font-family: var(--serif); font-weight: 600; font-size: 28px; letter-spacing: -.02em; }
 .loginform input { width: 100%; }
-.loginform button.primary { justify-content: center; padding: 11px 14px; }
+.loginform button.primary { justify-content: center; padding: 11px 14px; background: #094f30; border-color: #094f30; color: #fff; }
+.loginform button.primary:hover:not(:disabled) { background: #0b3f27; border-color: #0b3f27; }
+.lh-foot { margin: 18px 0 0; padding-top: 14px; border-top: 1px dashed #e7dfcf; font-size: 12px; color: #736d61; display: flex; gap: 8px; align-items: center; }
+.lh-foot svg { color: #094f30; flex: none; }
+@media (max-width: 860px) {
+  .login-page { grid-template-columns: 1fr; align-content: start; }
+  .lh-brand { padding: 28px 22px 4px; gap: 8px; }
+  .lh-nest, .lh-brand .eyebrow { display: none; }
+  .lh-title h1 { font-size: 36px; }
+  .lh-form-wrap { padding: 18px 16px 32px; place-items: start center; }
+  .lh-card { padding: 26px 22px 20px; }
+}
 
 /* ---------- Catálogos ---------- */
 .cfg { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
@@ -311,9 +326,6 @@ mark { background: var(--marca); color: inherit; padding: 0 1px; }
   .nav .count { position: absolute; margin: 0 0 0 26px; font-size: 10px; padding: 0 5px; min-width: 0; }
   .content { padding-bottom: 110px; }
   .mobile-top { display: flex !important; }
-  .login-page { grid-template-columns: 1fr; }
-  .login-brand { padding: 32px 24px; }
-  .login-brand ul { display: none; }
   .hist-row { grid-template-columns: 36px minmax(0, 1fr) auto; }
   .hist-row .hide-sm { display: none; }
   .hist-detail { padding-left: 16px; }
@@ -407,8 +419,6 @@ mark { background: var(--marca); color: inherit; padding: 0 1px; }
 .brand-row { display: flex; align-items: center; gap: 12px; }
 .brand-row h1 { margin: 2px 0 0; font-size: 26px; }
 .appver { padding: 0 20px 12px; font-size: 11px; color: var(--rotulo); letter-spacing: .04em; }
-.login-ant { display: block; margin-top: 28px; }
-.login-brand .tagline { font-size: 20px; font-weight: 500; opacity: .95; margin: 6px 0 14px; letter-spacing: -.01em; }
 .mobile-top { gap: 8px; }
 .empty .ic.ant { color: var(--bosque); border-color: var(--bosque); background: var(--bosque-claro); }
 @media (max-width: 860px) { .appver { display: none; } }
